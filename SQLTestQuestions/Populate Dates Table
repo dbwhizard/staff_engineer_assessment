@@ -1,0 +1,54 @@
+USE [PersonDatabase]
+GO
+
+DECLARE @StartDate DATE = '20100101', @NumberOfDaysBeyondToday INT = 500;
+
+
+SET DATEFIRST 7;
+SET DATEFORMAT mdy;
+SET LANGUAGE US_ENGLISH;
+
+DECLARE @CutoffDate DATE = DATEADD(DAY, @NumberOfDaysBeyondToday, GetDate());
+Drop table #dim
+
+-- this is just a holding table for intermediate calculations:
+
+CREATE TABLE #dim
+(
+  [DateValue]       DATE PRIMARY KEY, 
+  [DateDayofMonth]        AS DATEPART(DAY,      [DateValue]),
+  [DateDayofYear] AS  DATEDIFF(day,STR(YEAR(DateValue),4)+'0101',DateValue)+1,
+  [DateQuarter]   AS DATEPART(QUARTER,  [DateValue]),
+  [DateWeekdayName] AS Datename(weekday,[DateValue]),
+  [DateMonthName]      AS DATENAME(MONTH,    [DateValue]),
+[DateYearMonth] AS DATEPART(YEAR,     [DateValue])*100 + DATEPART(MONTH,     [DateValue])
+);
+
+
+INSERT #dim([DateValue]) 
+SELECT d
+FROM
+(
+  SELECT d = DATEADD(DAY, rn - 1, @StartDate)
+  FROM 
+  (
+    SELECT TOP (DATEDIFF(DAY, @StartDate, @CutoffDate)) 
+      rn = ROW_NUMBER() OVER (ORDER BY s1.[object_id])
+    FROM sys.all_objects AS s1
+    CROSS JOIN sys.all_objects AS s2
+      ORDER BY s1.[object_id]
+  ) AS x
+) AS y;
+
+
+
+INSERT INTO [dbo].[Dates]
+           ([DateValue]
+           ,[DateDayofMonth]
+           ,[DateDayofYear]
+           ,[DateQuarter]
+           ,[DateWeekdayName]
+           ,[DateMonthName]
+           ,[DateYearMonth])
+
+		   SELECT * from #dim
