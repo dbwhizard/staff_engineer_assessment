@@ -1,0 +1,23 @@
+USE [PersonDatabase]
+GO
+
+/****** Object:  Table [dbo].[Person_Cleaned]    Script Date: 10/20/2019 10:16:34 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Person_Cleaned](
+	[PersonID] [int] NULL,
+	[PersonFirstName] [varchar](255) NULL,
+	[PersonFirstNameAlias] [varchar](255) NULL,
+	[PersonFirstNameMetaphone]  AS ([dbo].[Metaphone]([PersonFirstName])),
+	[PersonLastName] [varchar](255) NULL,
+	[PersonLastNameMetaphone]  AS ([dbo].[Metaphone]([PersonLastName])),
+	[Sex] [varchar](10) NULL,
+	[DateofBirth] [datetime] NULL,
+	[Address] [varchar](255) NULL,
+	[IsActive] [int] NULL
+) ON [PRIMARY]
+GO
