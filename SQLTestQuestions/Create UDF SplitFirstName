@@ -1,0 +1,43 @@
+USE [PersonDatabase]
+GO
+/****** Object:  UserDefinedFunction [dbo].[SplitFirstName]    Script Date: 10/20/2019 9:54:20 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER FUNCTION [dbo].[SplitFirstName]
+(
+	-- Add the parameters for the function here
+	@PersonName varchar(255)
+)
+RETURNS VARCHAR(255)
+
+AS
+BEGIN
+Declare @NameString varchar(255)
+Declare @FirstName varchar(255)
+Declare @RemoveChars as varchar(50)
+    Set @RemoveChars = '%[0-9()!@#$%&*]%'
+
+--Remove Alias
+SELECT @NameString=
+	  Case 
+	  WHEN 0=CHARINDEX('(',@PersonName) and 0=CHARINDEX(')',@PersonName) THEN @PersonName            --No "(" or ")"
+	  WHEN 0<>CHARINDEX('(',@PersonName) and 0<>CHARINDEX(')',@PersonName) 
+		THEN SUBSTRING (@PersonName,1, CHARINDEX('(',@PersonName)-1) + SUBSTRING (@PersonName, CHARINDEX(')',@PersonName)+1,LEN(@PersonName)- CHARINDEX(')',@PersonName) )
+	  END 
+
+--Clean Non-abc chars
+While PatIndex(@RemoveChars, @NameString) > 0
+        Set @NameString = Stuff(@NameString, PatIndex(@RemoveChars, @NameString), 1, '')
+
+
+SET @FirstName=SUBSTRING(@NameString,PATINDEX('%[A-Z,a-z]%',@NameString),CHARINDEX(' ',SUBSTRING(@NameString,PATINDEX('%[A-Z,a-z]%',@NameString),len(@NameString)) + ' ') - 1) 
+
+
+
+	-- Return the result of the function
+RETURN @FirstName
+
+END
