@@ -59,7 +59,12 @@ between 1/1/2010 and 500 days past the current date.
 
 
 **********************/
+/*
+Most important point here is to decide how to create a necessary loop to polate the required number of the table rows without using
+cursor and explicit loops. My solution uses system tables (it is not my original idea, credit goes to somebody else).
 
+I commited the SQL Script 
+*/
 
 /**********************
 
