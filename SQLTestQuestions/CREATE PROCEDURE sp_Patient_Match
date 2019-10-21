@@ -1,0 +1,53 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+/* =============================================
+-- Author:		LB
+-- Create date: 10/20/2019
+-- Description:	Create a patient matching stored procedure that accepts (first name, last name, dob and sex) as parameters and 
+	and calculates a match score from the Person table based on the parameters given. If the parameters do not match the existing 
+	data exactly, create a partial match check using the weights below to assign partial credit for each. Return PatientIDs and the
+	calculated match score. 
+-- =============================================*/
+CREATE PROCEDURE sp_Patient_Match
+	-- Add the parameters for the stored procedure here
+@First_Name_in Varchar(255),
+@Last_Name_in Varchar(255),
+@DOB_in datetime,
+@Sex_in varchar(10)
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+SELECT TOP 1 A.[PersonID], FirstNameScore+LastNameScore+DOBScore+SexScore AS Match_Score
+
+FROM
+(SELECT [PersonID]
+      ,[PersonFirstName]
+      ,[PersonFirstNameMetaphone]
+      ,[PersonLastName]
+      ,[PersonLastNameMetaphone]
+      ,[Sex]
+      ,[DateofBirth]
+	  , CASE WHEN PersonFirstName=@First_Name_in THEN 1.0 ELSE 0.5 END as FirstNameScore
+	  , CASE WHEN PersonLastName=@Last_Name_in THEN 0.8 ELSE 0.4 END as LastNameScore
+	  , CASE WHEN DateofBirth=@DOB_in THEN 0.75 ELSE 0.3 END as DOBScore
+	  , CASE WHEN Sex=Substring(Upper(@Sex_in),1,1) THEN 0.6 ELSE 0.25 END as SexScore
+
+FROM Person_Cleaned
+WHERE PersonFirstNameMetaphone=dbo.Metaphone(@First_Name_in) and --Fuzzy match includes full match
+PersonLastNameMetaphone=dbo.Metaphone(@Last_Name_in) and
+Year(DateofBirth)*100 + MONTH(DateOfBirth)=Year(@DOB_in)*100 + MONTH(@DOB_in) 
+and (Sex='M' and UPPER(@Sex_in) in ('M','MALE', 'MAN', 'MR.', 'MR') OR Sex='F' and UPPER(@Sex_in) in ('F','FEMALE', 'WOMAN', 'MS.','MRS.','MISS') ) ---Fuzzy Logic on Sex/Title
+) A
+ORDER by FirstNameScore+LastNameScore+DOBScore+SexScore
+
+
+
+
+
+
+END
+GO
