@@ -1,0 +1,26 @@
+USE  [PersonDatabase]
+--Step 1
+DECLARE @DateSequence TABLE (
+    [PersonID] INT
+    ,[DATE] DATETIME NOT NULL
+     )
+	 INSERT INTO @DateSequence
+	SELECT distinct [PersonID],  [DateValue]
+	FROM Contracts Inner join [Dates] on DateValue >= ContractStartDate and DateValue <= ContractEndDate 
+	Order By PersonID, DateValue
+--Step 2
+;WITH mycte
+AS (
+    SELECT *
+        ,DATEADD(DAY, - ROW_NUMBER() OVER (
+                PARTITION BY [PersonID] ORDER BY [Date]
+                ), [Date]) AS grp
+    FROM @DateSequence
+    )
+SELECT   [PersonID], min([Date]) AS [From]
+    ,max([Date]) AS [To]
+FROM mycte
+GROUP BY 
+    [PersonID]
+    ,grp
+ORDER BY [PersonID],[From];
