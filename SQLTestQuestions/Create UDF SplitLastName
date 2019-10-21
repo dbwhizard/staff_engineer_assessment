@@ -1,0 +1,42 @@
+USE [PersonDatabase]
+GO
+/****** Object:  UserDefinedFunction [dbo].[SplitLastName]    Script Date: 10/20/2019 8:57:01 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER FUNCTION [dbo].[SplitLastName]
+(
+	-- Add the parameters for the function here
+	@PersonName varchar(255)
+)
+RETURNS VARCHAR(255)
+
+AS
+BEGIN
+Declare @NameString varchar(255)
+Declare @LastName varchar(255)
+Declare @RemoveChars as varchar(50)
+    Set @RemoveChars = '%[0-9()!@#$%&*]%'
+
+--Remove Alias
+SELECT @NameString=
+	  Case 
+	  WHEN 0=CHARINDEX('(',@PersonName) and 0=CHARINDEX(')',@PersonName) THEN @PersonName            --No "(" or ")"
+	  WHEN 0<>CHARINDEX('(',@PersonName) and 0<>CHARINDEX(')',@PersonName) 
+		THEN SUBSTRING (@PersonName,1, CHARINDEX('(',@PersonName)-1) + SUBSTRING (@PersonName, CHARINDEX(')',@PersonName)+1,LEN(@PersonName)- CHARINDEX(')',@PersonName) )
+	  END 
+--Clean Non-abc chars
+While PatIndex(@RemoveChars, @NameString) > 0
+        Set @NameString = Stuff(@NameString, PatIndex(@RemoveChars, @NameString), 1, '')
+
+--Remove Leading And Trailing Spaces
+SET @NameString=LTRIM(RTRIM(@NameString))
+SET @LastName=STUFF(RIGHT(@NameString, CHARINDEX(' ', REVERSE(@NameString))),1,1,'')
+
+
+-- Return the result of the function
+RETURN @LastName
+
+END
