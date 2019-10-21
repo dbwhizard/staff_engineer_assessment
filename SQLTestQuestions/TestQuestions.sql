@@ -83,4 +83,7 @@ month or year is not necessary.
 Use the dbo.Dates table if helpful.
 
 **********************/
-
+/*
+I use two step process here to make it more readable and more manageable. First step creates a sequence of dates for each Person when 
+they had attribution. The second step generates continous data ranges based on the above. I used CTE (Common Table Expressions) for the 2nd step as it
+is the best approach to analyse and group set of rows. The resulting SQL Script is commited in this repository under the name AttributionIntervals.
