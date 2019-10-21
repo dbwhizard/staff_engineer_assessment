@@ -1,0 +1,26 @@
+USE [PersonDatabase]
+GO
+TRUNCATE Table [dbo].[Person_Cleaned]
+
+INSERT INTO [dbo].[Person_Cleaned]
+           ([PersonID]
+           ,[PersonFirstName]
+           ,[PersonFirstNameAlias]
+           ,[PersonLastName]
+           ,[Sex]
+           ,[DateofBirth]
+           ,[Address]
+           ,[IsActive])
+ 
+SELECT [PersonID]
+      ,[dbo].[SplitFirstName]([PersonName]) [PersonFirstName]
+      ,[dbo].[SplitAlias]([PersonName]) [PersonFirstNameAlias]
+  
+      ,[dbo].[SplitLastName]([PersonName]) [PersonLastName]
+     
+      ,Case WHEN UPPER(SEX) NOT IN ('F','M','MALE','FEMALE') THEN NULL WHEN UPPER([Sex])='MALE' THEN 'M' WHEN UPPER([Sex])='FEMALE' THEN 'F' ELSE UPPER(Sex) END[Sex]
+      ,[DateofBirth]
+      ,[Address]
+      ,[IsActive]
+  FROM [dbo].[Person]
+GO
