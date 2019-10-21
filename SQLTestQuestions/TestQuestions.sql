@@ -36,6 +36,17 @@ Sex
 
 
 **********************/
+/*
+Notes:
+All Create scripts for the new objects are commited to this repository and have self-explanatory names.
+I decided that in order to work with the Person data is needs to be cleaned and parsed, so I created a table to store the cleaned data, 
+which includes separate fields for first, last names and alias/nickname. I also included there two computed columns for doing the fuzzy 
+match on the first and last names, using well known metaphone algorythm.
+
+I wrote the required sp, where I assume that the output score is the sum of the individual scores. My approcah is the first to find 
+one or multiple table rows based on the fuzzy match (metaphones of the first and last names, Year-Month of DOB and variations 
+of the Sex/Gender/Title descriptions, then I look at the degree of the match byevery field and assign corresponding individual scores.
+*/
 
 
 
