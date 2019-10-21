@@ -1,0 +1,40 @@
+USE [PersonDatabase]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[SplitAlias]    Script Date: 10/20/2019 10:21:57 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date, ,>
+-- Description:	<Description, ,>
+-- =============================================
+CREATE FUNCTION [dbo].[SplitAlias]
+(
+	-- Add the parameters for the function here
+	@PersonName varchar(255)
+)
+RETURNS VARCHAR(255)
+
+AS
+BEGIN
+	-- Declare the return variable here
+Declare @NameAlias varchar(255);	
+
+	-- Add the T-SQL statements to compute the return value here
+	SELECT @NameAlias=
+	  Case WHEN 0=CHARINDEX('(',@PersonName) OR 0=CHARINDEX(')',@PersonName) THEN NULL
+	  WHEN 0=CHARINDEX('(',@PersonName) OR 0=CHARINDEX(')',@PersonName) THEN NULL
+	  WHEN SUBSTRING(@PersonName,CHARINDEX('(',@PersonName)+1,1) LIKE '[a-zA-Z]' AND SUBSTRING(@PersonName,CHARINDEX(')',@PersonName)-1,1) LIKE '[a-zA-Z]'   
+	  THEN SUBSTRING(@PersonName,CHARINDEX('(',@PersonName)+1, CHARINDEX(')',@PersonName)-CHARINDEX('(',@PersonName)-1 )
+	  END 
+
+	-- Return the result of the function
+	RETURN @NameAlias
+
+END
+GO
