@@ -26,12 +26,5 @@ same type delivered later on with different file dates and from different groups
      b. Only include records in which the patients risk has increased.
      
      
-     Notes:
-     
-     In the beginning I planned to use xlrd to get the data from Excel files, but it was too cumbersome to deal with the fields converted
-     to float, especially with the date fields, so after wasting a lot of time I ended up with using MS OpenRowset approach. In hindsight, 
-     using pandas with dataframes would be probably my Pythonish, but it is too late now.
-     
-     My scripts required only two modules: os and pyodbc. I created two more source files to fully test both scripts. My assumption is that the source Excel files will be provided in a directory, the name of which is passed as a parameter to the scripts. My testing is done with SQL Server 2014 Express. I am including the SQL script with command that are required to make OpenRowset to work. I also include the CSV files from the resulting Demographics (Q1) and Attribution(Q2) tables.
-     
-     I wanted to upload the 2 additional spreadsheets that I have created for testing, but the UPLOAD feature doesn't work for me for some reason :(
+     My scripts required only two modules: os and pyodbc.
+    
